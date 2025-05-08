@@ -1,0 +1,58 @@
+name: 'Git Action CI'
+
+on:
+  push:
+    branches:
+      - '"master"'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        required: false
+        default: 'main'
+
+env:
+  PROJECT_ID: 'graceful-chain-457201-j3' # TODO: update to your Google Cloud project ID
+  REGION: 'asia-northeast3' # TODO: update to your region
+  REPO: 'argo' # TODO: update to your service name
+  SERVICE: 'portal' # TODO: update to your service name
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/755542412142/locations/global/workloadIdentityPools/github-actions/providers/github-provider'
+  SERVICE_ACCOUNT: 'hskim-sa@graceful-chain-457201-j3.iam.gserviceaccount.com'
+  
+jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4' # actions/checkout@v4
+        
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2' # google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ env.SERVICE_ACCOUNT }}'
+          export_default_credentials: true
+        
+      - name: 'Configure Docker for GAR'
+        uses: google-github-actions/docker-auth@v1
+        with:
+          registry: ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: 'Build and Push Container'
+        run: |-
+          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:${{ github.sha }}"
+          echo "${DOCKER_TAG}"
+          docker build --tag "${DOCKER_TAG}" .
+          docker push "${DOCKER_TAG}"
+
+        # END - Docker auth and build
