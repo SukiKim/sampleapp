@@ -45,7 +45,7 @@ jobs:
 
       - name: 'Build and Push Container'
         run: |-
-          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:${{ github.sha }}
+          IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
           docker build -t $IMAGE .
           docker build --tag "${DOCKER_TAG}" .
           docker push $IMAGE
