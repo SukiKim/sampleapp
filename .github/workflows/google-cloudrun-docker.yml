@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'SHA'
         required: false
         default: 'main'
 
@@ -16,7 +15,7 @@ env:
   REGION: 'asia-northeast3' # TODO: update to your region
   REPO: 'argo' # TODO: update to your service name
   SERVICE: 'portal' # TODO: update to your service name
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/755542412142/locations/global/workloadIdentityPools/github-actions/providers/github-provider' # TODO: update to your workload identity provider
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/755542412142/locations/global/workloadIdentityPools/github-actions/providers/github-provider'
   SERVICE_ACCOUNT: 'hskim-sa@graceful-chain-457201-j3.iam.gserviceaccount.com'
   
 jobs:
