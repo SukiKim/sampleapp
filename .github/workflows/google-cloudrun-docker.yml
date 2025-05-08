@@ -17,6 +17,7 @@ env:
   REPO: 'argo' # TODO: update to your service name
   SERVICE: 'portal' # TODO: update to your service name
   WORKLOAD_IDENTITY_PROVIDER: 'projects/755542412142/locations/global/workloadIdentityPools/github-actions/providers/github-provider' # TODO: update to your workload identity provider
+  SERVICE_ACCOUNT: 'argocd-sa@graceful-chain-457201-j3.iam.gserviceaccount.com'
   
 jobs:
   deploy:
@@ -33,6 +34,7 @@ jobs:
         uses: 'google-github-actions/auth@v2' # google-github-actions/auth@v2
         with:
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ env.SERVICE_ACCOUNT }}'
 
       - name: 'Docker Auth'
         uses: 'docker/login-action@v3' # docker/login-action@v3
