@@ -3,12 +3,12 @@ name: 'Git Action CI'
 on:
   push:
     branches:
-      - '"master"'
+      - main
   workflow_dispatch:
     inputs:
       ref:
         required: false
-        default: 'main'
+        default: main
 
 env:
   PROJECT_ID: 'graceful-chain-457201-j3' # TODO: update to your Google Cloud project ID
@@ -42,10 +42,13 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
           export_default_credentials: true
+          
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
       - name: 'Build and Push Container'
         run: |-
           IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.SERVICE }}:latest
           docker build -t $IMAGE .
-          docker build --tag "${DOCKER_TAG}" .
           docker push $IMAGE
